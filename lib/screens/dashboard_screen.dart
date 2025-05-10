@@ -1,15 +1,52 @@
 import 'package:flutter/material.dart';
-import 'product_list_screen.dart'; // 🔹 Importowanie ekranu produktów
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:stockmaster/screens/reports_screen.dart';
+import 'user_management_screen.dart';
+import 'product_list_screen.dart';
+import 'login_screen.dart';
+import 'deliveries_screen.dart';
+
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  final String login;
+  const DashboardScreen({super.key, required this.login});
+
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => screen),
+    );
+  }
+
+  void _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('StockMaster - Dashboard'),
-        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Center(
+              child: Text(
+                'Zalogowany: $login',
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () => _logout(context),
+            icon: const Icon(Icons.logout),
+            tooltip: 'Wyloguj się',
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -17,21 +54,29 @@ class DashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Podsumowanie magazynu:',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'Warehouse summary:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 2.5,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 3, // 👈 mniejsze karty
                 children: [
-                  _buildCard(context, '📦 Produkty', '250', ProductListScreen()), // 🔹 Przekierowanie
-                  _buildCard(context, '🚚 Dostawy', '12', null),
-                  _buildCard(context, '📊 Raporty', '5', null),
-                  _buildCard(context, '⚠️ Braki', '3', null),
+                  _buildCard(context, '📦 Products', () {
+                    _navigateTo(context, const ProductListScreen());
+                  }),
+                  _buildCard(context, '🚚 Deliveries', () {
+                    _navigateTo(context, const DeliveriesScreen());
+                  }),
+                  _buildCard(context, '📊 Reports', () {
+                     _navigateTo(context, const ReportsScreen());
+                  }),
+                  _buildCard(context, '⚙️ Users', () {
+                    _navigateTo(context, const UserManagementScreen());
+                  }),
                 ],
               ),
             ),
@@ -41,37 +86,20 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(BuildContext context, String title, String value, Widget? screen) {
-    return InkWell(
-      onTap: screen != null
-          ? () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => screen),
-              );
-            }
-          : null, // 🔹 Jeśli `screen` to null, kliknięcie jest nieaktywne
-      borderRadius: BorderRadius.circular(10),
+  Widget _buildCard(BuildContext context, String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
       child: Card(
-        elevation: 3,
+        elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                value,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue),
-              ),
-            ],
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
           ),
         ),
       ),

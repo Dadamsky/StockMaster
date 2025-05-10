@@ -149,4 +149,9 @@ class FirebaseService {
       print("❌ Błąd podczas usuwania produktu: $e");
     }
   }
+  // AKtualizacja stanu produktów
+  Future<void> updateStock(String productId, int newStock) async {
+  await productsCollection.doc(productId).update({'stock': newStock.toString()});
+  }
+  
 }
