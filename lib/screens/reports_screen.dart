@@ -38,7 +38,7 @@ class ReportsScreen extends StatelessWidget {
             icon: Icons.warning_amber_rounded,
             title: 'Raport niskich stanów',
             subtitle: 'Lista produktów z małym zapasem',
-            destination: const ReportLowStockScreen(),
+            destination: const ReportLowStock(),
           ),
           const SizedBox(height: 12),
           _buildReportTile(
