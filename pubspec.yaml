@@ -43,6 +43,7 @@ dependencies:
   barcode: ^2.2.4
   fl_chart: ^0.45.1
   csv: ^5.0.0
+  intl: ^0.18.1
 
 
 dev_dependencies:

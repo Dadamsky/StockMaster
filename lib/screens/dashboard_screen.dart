@@ -30,7 +30,7 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('StockMaster - Dashboard'),
+        title: const Text('StockMaster - Pulpit nawigacyjny'),
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -53,29 +53,31 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Warehouse summary:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
             const SizedBox(height: 10),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
-                childAspectRatio: 3, // 👈 mniejsze karty
+                childAspectRatio: 3,
                 children: [
-                  _buildCard(context, '📦 Products', () {
+                  _buildCard(context, '📦 Produkty', () {
                     _navigateTo(context, const ProductListScreen());
                   }),
-                  _buildCard(context, '🚚 Deliveries', () {
+                  _buildCard(context, '🚚 Dostawy', () {
                     _navigateTo(context, const DeliveriesScreen());
                   }),
-                  _buildCard(context, '📊 Reports', () {
+                  _buildCard(context, '📊 Raporty', () {
                      _navigateTo(context, const ReportsScreen());
                   }),
-                  _buildCard(context, '⚙️ Users', () {
+                  _buildCard(context, '⚙️ Użytkownicy', () {
                     _navigateTo(context, const UserManagementScreen());
+                  }),
+                  _buildCard(context, '🧷 W trakcie pracy', () { // Może system rezerwacji produktu pod zamówienie
+                    _navigateTo;
+                  }),
+                  _buildCard(context, '🧷 W trakcie pracy', () { // Może system zamówień i wysyłek
+                    _navigateTo;
                   }),
                 ],
               ),

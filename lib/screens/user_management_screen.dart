@@ -40,7 +40,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('User added (note: not in Authentication)'),
+          content: const Text('Dodano użytkownika (notka: ale nie w Firebase Authentication)'),
           action: SnackBarAction(
             label: 'Open Firebase',
             onPressed: () {
@@ -69,14 +69,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Management'),
+        title: const Text('Zarządzanie użytkownikami'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Text('Add new user', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Dodaj użytkownika', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             TextField(
               controller: _loginController,
@@ -89,11 +89,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             TextField(
               controller: _passwordController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password (for reference)'),
+              decoration: const InputDecoration(labelText: 'Hasło'),
             ),
             DropdownButtonFormField<String>(
               value: _selectedRole,
-              decoration: const InputDecoration(labelText: 'Role'),
+              decoration: const InputDecoration(labelText: 'Rola'),
               items: _roles.map((role) {
                 return DropdownMenuItem(value: role, child: Text(role));
               }).toList(),
@@ -109,10 +109,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             ElevatedButton.icon(
               onPressed: _createUser,
               icon: const Icon(Icons.person_add),
-              label: const Text('Add user'),
+              label: const Text('Dodaj'),
             ),
             const Divider(height: 32),
-            const Text('User list', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Lista użytkowników', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             StreamBuilder<QuerySnapshot>(
               stream: _db.collection('users').snapshots(),

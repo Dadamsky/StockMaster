@@ -13,9 +13,9 @@ class AddProductScreen extends StatefulWidget {
 class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _stockController = TextEditingController();
-  String _selectedCategory = "Komputery"; // Domyślna wartość
-  String _selectedLocation = "SM-1-1"; // Domyślna wartość
-  String _productCode = "Generowanie..."; // Domyślna wartość
+  String _selectedCategory = "Inne"; 
+  String _selectedLocation = "SM-1-1"; 
+  String _productCode = "Generowanie...";
 
   void _addProduct() async {
     final name = _nameController.text;
@@ -49,7 +49,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             DropdownButtonFormField<String>(
               value: _selectedCategory,
               decoration: const InputDecoration(labelText: 'Kategoria'),
-              items: ["Komputery", "Laptopy", "Inne", "Akcesoria"]
+              items: ["Komputery", "Laptopy", "Inne", "Akcesoria", "Telefony"]
                   .map((category) => DropdownMenuItem(
                         value: category,
                         child: Text(category),
