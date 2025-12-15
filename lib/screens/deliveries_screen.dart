@@ -16,7 +16,7 @@ class _DeliveriesScreenState extends State<DeliveriesScreen> {
 
   void _showDeliveryDialog(BuildContext context, String productId, String productName,
       String productCode, int currentStock) {
-    final TextEditingController _qtyController = TextEditingController();
+    final TextEditingController qtyController = TextEditingController();
 
     showDialog(
       context: context,
@@ -24,7 +24,7 @@ class _DeliveriesScreenState extends State<DeliveriesScreen> {
         return AlertDialog(
           title: Text('Dodaj dostawę: $productName'),
           content: TextField(
-            controller: _qtyController,
+            controller: qtyController,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(labelText: 'Ilość sztuk'),
           ),
@@ -35,7 +35,7 @@ class _DeliveriesScreenState extends State<DeliveriesScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                final qty = int.tryParse(_qtyController.text);
+                final qty = int.tryParse(qtyController.text);
                 if (qty == null || qty <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Wprowadź poprawną ilość')),
@@ -44,7 +44,7 @@ class _DeliveriesScreenState extends State<DeliveriesScreen> {
                 }
 
                 final newStock = currentStock + qty;
-                await _firebaseService.updateStock(productId, newStock);
+                await _firebaseService.updateStock(productId, newStock); 
 
                 final historyCode = await _firebaseService.generateHistoryCode("PM");
                 await FirebaseFirestore.instance.collection('history').add({
@@ -53,6 +53,7 @@ class _DeliveriesScreenState extends State<DeliveriesScreen> {
                   'type': 'PM',
                   'date': Timestamp.now(),
                   'description': 'Dostarczono $qty szt. do produktu $productCode',
+                  'quantity': qty.toString(),
                 });
 
                 if (context.mounted) Navigator.pop(context);
@@ -66,24 +67,38 @@ class _DeliveriesScreenState extends State<DeliveriesScreen> {
     );
   }
 
+  InputDecoration _getInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: const Icon(Icons.search),
+      filled: true,
+      fillColor: Colors.grey[100],
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dostawy'),
+        title: const Text('Przyjęcie Towaru', style: TextStyle(fontWeight: FontWeight.w600)),
         centerTitle: true,
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: 'Szukaj po kodzie produktu (np. SM0005)',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
+              decoration: _getInputDecoration('Szukaj po kodzie produktu (np. SM0005)'),
               onChanged: (value) {
                 setState(() {
                   _searchTerm = value.trim().toLowerCase();
@@ -91,6 +106,7 @@ class _DeliveriesScreenState extends State<DeliveriesScreen> {
               },
             ),
           ),
+          
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _firebaseService.getProducts(),
@@ -118,19 +134,39 @@ class _DeliveriesScreenState extends State<DeliveriesScreen> {
                     final name = data['name'] ?? '';
                     final productCode = data['productCode'] ?? '';
                     final stock = int.tryParse(data['stock'] ?? '0') ?? 0;
-
-                    return ListTile(
-                      title: Text('$productCode - $name'),
-                      subtitle: Text('Stan: $stock szt.'),
-                      trailing: ElevatedButton(
-                        onPressed: () => _showDeliveryDialog(
-                          context,
-                          productId,
-                          name,
-                          productCode,
-                          stock,
+                    final location = data['location'] ?? 'Brak';
+                    
+                    return Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(Icons.inventory_2_outlined, color: primaryColor),
                         ),
-                        child: const Text('Dodaj dostawę'),
+                        title: Text('$productCode - $name', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('Lokalizacja: $location | Stan: $stock szt.'),
+                        trailing: ElevatedButton.icon(
+                          onPressed: () => _showDeliveryDialog(
+                            context,
+                            productId,
+                            name,
+                            productCode,
+                            stock,
+                          ),
+                          icon: const Icon(Icons.add_shopping_cart, size: 18),
+                          label: const Text('PRZYJMIJ'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade700, // Zielony akcent dla przyjęcia
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
                       ),
                     );
                   },
